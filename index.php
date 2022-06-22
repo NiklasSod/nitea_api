@@ -98,4 +98,16 @@
             echo json_encode($response);
             echo json_encode($response2);
             break;
+
+        case "DELETE":
+            $sql = "DELETE FROM product_categories WHERE product_id = :product_id;";
+            $sql2 = "DELETE FROM products WHERE product_id = :product_id;";
+            $path = explode('/', $_SERVER['REQUEST_URI']);
+            $stmt = $conn->prepare($sql);
+            $stmt2 = $conn->prepare($sql2);
+            $stmt->bindParam(':product_id', $path[4]);
+            $stmt2->bindParam(':product_id', $path[4]);
+            $stmt->execute();
+            $stmt2->execute();
+            break;
     }
