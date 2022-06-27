@@ -14,7 +14,7 @@
     switch($method) {
         case "GET":
             $path = explode('/', $_SERVER['REQUEST_URI']);
-            $sql = "SELECT p.product_id AS id, p.product_name AS name, p.product_price AS price, p.product_url, c.currency_name AS currency, GROUP_CONCAT(ca.category_name SEPARATOR ', ') AS genre";
+            $sql = "SELECT p.product_id AS id, p.product_name AS name, p.product_price AS price, p.product_url, c.currency_name AS currency, GROUP_CONCAT(ca.category_name SEPARATOR ', ') AS genre, p.release_status";
             // for edit view, fetch only the id to edit
             if (isset($path[4]) && is_numeric($path[4])){
                 $sql.= " FROM products as p
@@ -110,4 +110,4 @@
             $stmt->execute();
             $stmt2->execute();
             break;
-    }
+    };
