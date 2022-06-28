@@ -44,8 +44,8 @@
 
         case "POST":
             $product = json_decode(file_get_contents('php://input'));
-            $sql = "INSERT INTO products(product_id, product_name, product_url, product_price, currency_id)
-                VALUES(null, :product_name, :product_url, :product_price, :currency_id);";
+            $sql = "INSERT INTO products(product_id, product_name, product_url, product_price, currency_id, release_status)
+                VALUES(null, :product_name, :product_url, :product_price, :currency_id, :release_status);";
             
             $sql2 = "INSERT INTO product_categories(product_id, category_id)
                 VALUES(LAST_INSERT_ID(), :category_id);";
@@ -55,6 +55,7 @@
             $stmt->bindParam(':product_url', $product->product_url);
             $stmt->bindParam(':product_price', $product->product_price);
             $stmt->bindParam(':currency_id', $product->currency_id);
+            $stmt->bindParam(':release_status', $product->released);
             $stmt2->bindParam(':category_id', $product->category_id);
             if($stmt->execute()){
                 $response = ['status' => 1, 'message' => 'Product created!'];
