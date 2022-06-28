@@ -56,19 +56,34 @@
             $stmt->bindParam(':product_price', $product->product_price);
             $stmt->bindParam(':currency_id', $product->currency_id);
             $stmt->bindParam(':release_status', $product->released);
-            $stmt2->bindParam(':category_id', $product->category_id);
+            
             if($stmt->execute()){
                 $response = ['status' => 1, 'message' => 'Product created!'];
             } else {
                 $response = ['status' => 0, 'message' => 'Failed to create product.'];
-            }
-            if($stmt2->execute()){
-                $response2 = ['status' => 1, 'message' => 'Category created!'];
+            };
+
+            if(is_array($product->category_id)){
+                $j = count($product->category_id);
+                for($i = 0; $i < $j; $i++){
+                    $stmt2->bindParam(':category_id', $product->category_id[$i]);
+                    if($stmt2->execute()){
+                        $response2 = ['status' => 1, 'message' => 'Category created!'];
+                    } else {
+                        $response2 = ['status' => 0, 'message' => 'Failed to create category.'];
+                    };
+                };
             } else {
-                $response2 = ['status' => 0, 'message' => 'Failed to create category.'];
-            }
+                $stmt2->bindParam(':category_id', $product->category_id);
+                if($stmt2->execute()){
+                    $response2 = ['status' => 1, 'message' => 'Category created!'];
+                } else {
+                    $response2 = ['status' => 0, 'message' => 'Failed to create category.'];
+                };
+            };
+
             echo json_encode($response);
-            echo json_encode($response2);
+            // echo json_encode($response2);
             break;
 
         case "PUT":
@@ -91,12 +106,12 @@
                 $response = ['status' => 1, 'message' => 'Product updated!'];
             } else {
                 $response = ['status' => 0, 'message' => 'Failed to update product.'];
-            }
+            };
             if($stmt2->execute()){
                 $response2 = ['status' => 1, 'message' => 'Category updated!'];
             } else {
                 $response2 = ['status' => 0, 'message' => 'Failed to update category.'];
-            }
+            };
             echo json_encode($response);
             echo json_encode($response2);
             break;
