@@ -74,7 +74,7 @@
         case "PUT":
             $product = json_decode(file_get_contents('php://input'));
             
-            $sql = "UPDATE products SET product_name = :product_name, product_url = :product_url, product_price = :product_price, currency_id = :currency_id WHERE product_id = :id;";
+            $sql = "UPDATE products SET product_name = :product_name, product_url = :product_url, product_price = :product_price, currency_id = :currency_id, release_status = :release_status WHERE product_id = :id;";
             
             $sql2 = "UPDATE product_categories SET category_id = :category_id WHERE product_id = :id;";
             $stmt = $conn->prepare($sql);
@@ -84,6 +84,7 @@
             $stmt->bindParam(':product_price', $product->price);
             $stmt->bindParam(':currency_id', $product->currency);
             $stmt->bindParam(':id', $product->id);
+            $stmt->bindParam(':release_status', $product->released);
             $stmt2->bindParam(':category_id', $product->genre);
             $stmt2->bindParam(':id', $product->id);
             if($stmt->execute()){
