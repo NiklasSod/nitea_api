@@ -69,41 +69,47 @@
             $product = json_decode(file_get_contents('php://input'));
             
             $sql = "UPDATE products SET product_name = :product_name, product_url = :product_url, product_price = :product_price, currency_id = :currency_id, release_status = :release_status WHERE product_id = :id;";
-            
-            $sql2 = "UPDATE product_categories SET category_id = :category_id WHERE product_id = :id;";
             $stmt = $conn->prepare($sql);
-            $stmt2 = $conn->prepare($sql2);
             $stmt->bindParam(':product_name', $product->name);
             $stmt->bindParam(':product_url', $product->product_url);
             $stmt->bindParam(':product_price', $product->price);
             $stmt->bindParam(':currency_id', $product->currency);
             $stmt->bindParam(':id', $product->id);
             $stmt->bindParam(':release_status', $product->released);
-            $stmt2->bindParam(':category_id', $product->genre);
-            $stmt2->bindParam(':id', $product->id);
             if($stmt->execute()){
                 $response = ['status' => 1, 'message' => 'Product updated!'];
             } else {
                 $response = ['status' => 0, 'message' => 'Failed to update product.'];
             };
-            if($stmt2->execute()){
-                $response2 = ['status' => 1, 'message' => 'Category updated!'];
-            } else {
-                $response2 = ['status' => 0, 'message' => 'Failed to update category.'];
+
+            $sql2 = "DELETE FROM product_categories WHERE product_id = :id;";
+            $stmt2 = $conn->prepare($sql2);
+            $stmt2->bindParam(':id', $product->id);
+            $stmt2->execute();
+
+            $j = count($product->category_id);
+            for($i = 0; $i < $j; $i++){
+                $sql3 = "INSERT INTO product_categories(product_id, category_id)
+                VALUES(:id , :category_id);";
+                $stmt3 = $conn->prepare($sql3);
+                $stmt3->bindParam(':id', $product->id);
+                $stmt3->bindParam(':category_id', $product->category_id[$i]);
+                $stmt3->execute();
             };
             echo json_encode($response);
-            echo json_encode($response2);
             break;
 
         case "DELETE":
-            $sql = "DELETE FROM product_categories WHERE product_id = :product_id;";
-            $sql2 = "DELETE FROM products WHERE product_id = :product_id;";
             $path = explode('/', $_SERVER['REQUEST_URI']);
+
+            $sql = "DELETE FROM product_categories WHERE product_id = :product_id;";
             $stmt = $conn->prepare($sql);
-            $stmt2 = $conn->prepare($sql2);
             $stmt->bindParam(':product_id', $path[4]);
-            $stmt2->bindParam(':product_id', $path[4]);
             $stmt->execute();
+
+            $sql2 = "DELETE FROM products WHERE product_id = :product_id;";
+            $stmt2 = $conn->prepare($sql2);
+            $stmt2->bindParam(':product_id', $path[4]);
             $stmt2->execute();
             break;
     };
